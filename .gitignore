@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Banco de Dados SQLite (dados locais — não versionar)
+*.db
+*.sqlite3
+
+# Flet Build
+frontend/build/
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Variáveis de ambiente (segredos)
+.env
+.env.*
+
+# Antigravity (IA)
+.gemini/
+.antigravity/
