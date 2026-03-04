@@ -1,0 +1,12 @@
+**/venv/
+**/.agent/
+**/backend/
+**/build/
+**/.fletbundle/
+**.png
+**.jpg
+**.jpeg
+**.ico
+**.exe
+**.md
+pip_list.txt
