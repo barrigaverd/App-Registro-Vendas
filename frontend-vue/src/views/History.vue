@@ -9,7 +9,7 @@ const goBack = () => router.push('/')
 
 const sales = ref([])
 const isLoading = ref(true)
-const salesTotal = computed(() => sales.value.reduce((acc, sale) => acc + sale.valor, 0))
+const salesTotal = computed(() => sales.value.reduce((acc, sale) => acc + (sale.valor * sale.quantidade), 0))
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
@@ -127,12 +127,15 @@ onMounted(() => {
 
           <div class="pl-2">
             <h3 class="font-bold text-lg text-text-primary mb-0.5">{{ sale.nome }}</h3>
-            <div class="flex items-center gap-3 text-sm text-text-secondary">
-              <span class="font-semibold text-primary/80">{{ formatCurrency(sale.valor) }}</span>
-              <span class="w-1 h-1 rounded-full bg-secondary"></span>
-              <span>Qtd: {{ sale.quantidade }}</span>
+            <div class="flex flex-col gap-1 text-sm text-text-secondary mt-1">
+              <div class="flex items-center gap-2">
+                <span class="font-semibold text-primary/80">{{ formatCurrency(sale.valor) }}</span>
+                <span class="w-1 h-1 rounded-full bg-secondary"></span>
+                <span>Qtd: {{ sale.quantidade }}</span>
+              </div>
+              <span class="font-bold text-primary text-xs bg-primary/10 w-fit px-2 py-0.5 rounded-md mt-0.5">Total: {{ formatCurrency(sale.valor * sale.quantidade) }}</span>
             </div>
-            <p v-if="sale.observacoes" class="text-xs text-text-secondary/70 mt-1 italic">
+            <p v-if="sale.observacoes" class="text-xs text-text-secondary/70 mt-1.5 italic">
               "{{ sale.observacoes }}"
             </p>
           </div>

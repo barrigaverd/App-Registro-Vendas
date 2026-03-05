@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowLeft, Gift, DollarSign, Hash, MessageSquare, Heart, CheckCircle } from 'lucide-vue-next'
-import { createSale } from '../services/api'
+import { ArrowLeft, Gift, DollarSign, Package, MessageSquare, Heart, CheckCircle, Clock } from 'lucide-vue-next'
+import { createSale, getSalesToday } from '../services/api'
 
 const router = useRouter()
 const goBack = () => router.push('/')
@@ -52,6 +52,34 @@ const submitSale = async () => {
     isLoading.value = false
   }
 }
+
+const recentProducts = ref([])
+
+const loadRecentProducts = async () => {
+  try {
+    const sales = await getSalesToday()
+    const uniqueMap = new Map()
+    for (const sale of [...sales].reverse()) {
+      const key = sale.nome.toLowerCase().trim()
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, { nome: sale.nome, valor: sale.valor })
+      }
+    }
+    recentProducts.value = Array.from(uniqueMap.values()).slice(0, 10)
+  } catch (error) {
+    console.error("Erro ao carregar produtos recentes:", error)
+  }
+}
+
+const selectRecentProduct = (product) => {
+  form.value.nome = product.nome
+  // Replace dot with comma for inputmode="decimal" consistency if desired, or just pass as string
+  form.value.valor = product.valor.toString().replace('.', ',')
+}
+
+onMounted(() => {
+  loadRecentProducts()
+})
 </script>
 
 <template>
@@ -68,7 +96,33 @@ const submitSale = async () => {
     <div class="glass-card p-6 flex flex-col space-y-6">
       
       <div class="text-center mb-2">
-        <h2 class="text-xl font-body font-semibold text-primary">Destaque do Dia</h2>
+        <h2 class="text-xl font-body font-semibold text-primary">O que estamos vendendo, amor?</h2>
+      </div>
+
+      <!-- Recent Products Mini Cards -->
+      <div v-if="recentProducts.length > 0" class="flex flex-col space-y-3 -mt-2">
+        <div class="flex items-center gap-2 text-primary/70 mb-1">
+          <Clock class="w-4 h-4" />
+          <h3 class="text-xs font-body font-bold uppercase tracking-wider">Produtos Recentes</h3>
+        </div>
+        
+        <div class="flex overflow-x-auto gap-3 pb-3 no-scrollbar -mx-2 px-2">
+          <button 
+            v-for="product in recentProducts" 
+            :key="product.nome"
+            @click="selectRecentProduct(product)"
+            type="button"
+            class="flex-shrink-0 flex items-center gap-3 bg-white/50 border border-primary/10 hover:bg-white hover:shadow-md hover:border-primary/30 rounded-full pl-1.5 pr-4 py-1.5 transition-all group focus:outline-none focus:ring-2 focus:ring-primary/40 transform active:scale-95 max-w-[220px]"
+          >
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary shadow-inner shrink-0 scale-95 group-hover:scale-105 transition-transform">
+              <Package class="w-4 h-4" />
+            </div>
+            <div class="flex flex-col justify-center text-left">
+              <span class="font-bold text-text-primary group-hover:text-primary transition-colors text-sm truncate max-w-[120px]" :title="product.nome">{{ product.nome }}</span>
+              <span class="text-text-secondary/80 text-[11px] font-medium">{{ new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.valor) }}</span>
+            </div>
+          </button>
+        </div>
       </div>
 
       <form @submit.prevent="submitSale" class="space-y-4">
@@ -104,7 +158,7 @@ const submitSale = async () => {
         <!-- Input Quantidade -->
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary">
-            <Hash class="w-5 h-5" />
+            <Package class="w-5 h-5" />
           </div>
           <input 
             v-model="form.quantidade" 
@@ -153,3 +207,13 @@ const submitSale = async () => {
     </transition>
   </div>
 </template>
+
+<style scoped>
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

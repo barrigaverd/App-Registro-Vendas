@@ -9,7 +9,7 @@ const api = axios.create({
 
 export const getSalesToday = async () => {
   try {
-    const today = new Date().toISOString().split('T')[0]
+    const today = new Date().toLocaleDateString('en-CA')
     const response = await api.get(`/vendas/?data=${today}`)
     return response.data
   } catch (error) {
