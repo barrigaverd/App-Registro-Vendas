@@ -1,4 +1,6 @@
-# Python
+# ============================================================
+# Python (Backend FastAPI)
+# ============================================================
 __pycache__/
 *.py[cod]
 *.pyo
@@ -6,8 +8,6 @@ __pycache__/
 *.pyc
 *.egg
 *.egg-info/
-dist/
-build/
 .eggs/
 
 # Virtual Environment
@@ -15,31 +15,72 @@ build/
 venv/
 env/
 
-# Banco de Dados SQLite (dados locais — não versionar)
+# Banco de dados SQLite (dados locais)
 *.db
 *.sqlite3
 
-# Flet Build
-frontend/build/
+# ============================================================
+# Node.js / Vue / Vite (Frontend)
+# ============================================================
+node_modules/
+dist/
+.cache/
+.parcel-cache/
 
+# Vite
+*.local
+
+# ============================================================
+# Capacitor / Android / iOS
+# ============================================================
+# Android — pasta gerada automaticamente pelo Capacitor
+frontend-vue/android/
+frontend-vue/ios/
+
+# iOS Pods
+Pods/
+*.xcworkspace
+
+# ============================================================
+# Build artifacts
+# ============================================================
+build/
+*.apk
+*.aab
+*.ipa
+
+# ============================================================
 # IDEs
+# ============================================================
 .vscode/
 .idea/
 *.suo
 *.user
 
+# ============================================================
 # OS
+# ============================================================
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Logs
+# ============================================================
+# Logs e temporários
+# ============================================================
 *.log
+*.txt.bak
+flet_*.txt
+pip_list.txt
 
+# ============================================================
 # Variáveis de ambiente (segredos)
+# ============================================================
 .env
 .env.*
+!.env.example
 
-# Antigravity (IA)
+# ============================================================
+# Antigravity / IA
+# ============================================================
 .gemini/
 .antigravity/

@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-text-primary antialiased;
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+/* Custom Router Transitions */
+.slide-fade-enter-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.slide-fade-enter-from {
+  transform: translateX(20px);
+  opacity: 0;
+}
+.slide-fade-leave-to {
+  transform: translateX(-20px);
+  opacity: 0;
+}
+
+/* Glassmorphism utility */
+.glass-card {
+  @apply bg-surface/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl border border-white/40;
+}
