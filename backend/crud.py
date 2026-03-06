@@ -33,6 +33,7 @@ def update_venda(db: Session, venda_id: int, venda_update: schemas.VendaCreate):
         db_venda.valor = venda_update.valor
         db_venda.quantidade = venda_update.quantidade
         db_venda.observacoes = venda_update.observacoes
+        db_venda.venda_lancada = venda_update.venda_lancada
         # Preserva a data original se não vier no payload de edição
         if venda_update.data is not None:
             db_venda.data = venda_update.data

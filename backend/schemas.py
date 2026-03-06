@@ -8,6 +8,7 @@ class VendaBase(BaseModel):
     quantidade: int = 1
     observacoes: Optional[str] = None
     data: Optional[datetime] = None
+    venda_lancada: Optional[bool] = False
 
 class VendaCreate(VendaBase):
     pass

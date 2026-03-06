@@ -13,4 +13,9 @@ export const getVendas = async () => {
   return response.data.sort((a, b) => new Date(b.data) - new Date(a.data));
 };
 
+export const updateVenda = async (id, vendaData) => {
+  const response = await api.put(`/vendas/${id}`, vendaData);
+  return response.data;
+};
+
 export default api;

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getVendas } from '../services/api'
+import { getVendas, updateVenda } from '../services/api'
 import StatCard from '../components/StatCard.vue'
 import { DollarSign, ShoppingBag, TrendingUp, Calendar, CheckSquare, Square } from 'lucide-vue-next'
 
@@ -10,8 +10,6 @@ const error = ref(null)
 
 const periodoAtual = ref('hoje') // hoje, semana, mes
 
-// Toggable states state visual (efêmero)
-const lancados = ref(new Set())
 
 onMounted(async () => {
   await carregarVendas()
@@ -78,12 +76,15 @@ const ticketMedio = computed(() => {
   return totalArrecadado.value / qtdVendas.value
 })
 
-const toggleLancado = (id) => {
-  if (lancados.value.has(id)) {
-    lancados.value.delete(id)
-  } else {
-    lancados.value.add(id)
+const toggleLancado = async (venda) => {
+  venda.venda_lancada = !venda.venda_lancada
+  try{
+    await updateVenda(venda.id, venda)  
   }
+  catch(err){
+    console.error(err)
+    venda.venda_lancada = !venda.venda_lancada
+  }  
 }
 </script>
 
@@ -176,38 +177,38 @@ const toggleLancado = (id) => {
                 :key="venda.id"
                 :class="[
                   'border-t border-gray-50 transition-colors',
-                  lancados.has(venda.id) ? 'bg-success/5' : 'hover:bg-gray-50/50'
+                  venda.venda_lancada ? 'bg-success/5' : 'hover:bg-gray-50/50'
                 ]"
               >
                 <!-- Checkbox Lançado -->
                 <td class="p-4 text-center">
                   <button 
-                    @click="toggleLancado(venda.id)"
+                    @click="toggleLancado(venda)"
                     class="focus:outline-none transition-transform active:scale-95"
                   >
-                    <CheckSquare v-if="lancados.has(venda.id)" class="w-6 h-6 text-success mx-auto" stroke-width="2.5" />
+                    <CheckSquare v-if="venda.venda_lancada" class="w-6 h-6 text-success mx-auto" stroke-width="2.5" />
                     <Square v-else class="w-6 h-6 text-gray-300 hover:text-primary transition-colors mx-auto" />
                   </button>
                 </td>
                 
                 <td class="p-4">
-                  <p class="font-medium text-text-primary" :class="{'line-through text-text-secondary': lancados.has(venda.id)}">
+                  <p class="font-medium text-text-primary" :class="{'line-through text-text-secondary': venda.venda_lancada}">
                     {{ venda.nome }}
                   </p>
-                  <p v-if="venda.observacoes" class="text-xs text-text-secondary mt-0.5 truncate max-w-xs" :class="{'line-through': lancados.has(venda.id)}">
+                  <p v-if="venda.observacoes" class="text-xs text-text-secondary mt-0.5 truncate max-w-xs" :class="{'line-through': venda.venda_lancada}">
                     {{ venda.observacoes }}
                   </p>
                 </td>
-                <td class="p-4 text-sm text-text-secondary" :class="{'line-through': lancados.has(venda.id)}">
+                <td class="p-4 text-sm text-text-secondary" :class="{'line-through': venda.venda_lancada}">
                   {{ formatDate(venda.data) }}
                 </td>
-                <td class="p-4 text-text-primary" :class="{'line-through text-text-secondary': lancados.has(venda.id)}">
+                <td class="p-4 text-text-primary" :class="{'line-through text-text-secondary': venda.venda_lancada}">
                   {{ formatCurrency(venda.valor) }}
                 </td>
-                <td class="p-4 text-text-primary" :class="{'line-through text-text-secondary': lancados.has(venda.id)}">
+                <td class="p-4 text-text-primary" :class="{'line-through text-text-secondary': venda.venda_lancada}">
                   {{ venda.quantidade }}
                 </td>
-                <td class="p-4 font-bold text-primary" :class="{'line-through text-text-secondary font-medium': lancados.has(venda.id)}">
+                <td class="p-4 font-bold text-primary" :class="{'line-through text-text-secondary font-medium': venda.venda_lancada}">
                   {{ formatCurrency(venda.valor * venda.quantidade) }}
                 </td>
               </tr>
