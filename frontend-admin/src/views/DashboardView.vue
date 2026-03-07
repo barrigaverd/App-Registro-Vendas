@@ -209,6 +209,18 @@ const toggleLancado = async (venda) => {
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-gray-50/50 text-text-secondary text-sm">
+                <th class="p-4 font-medium text-center w-16">Status</th>
+                
+                <th class="p-4 font-medium text-left">Produto</th>
+                
+                <th class="p-4 font-medium text-left">Data</th>
+                
+                <th class="p-4 font-medium text-left">Unitário</th>
+                
+                <th class="p-4 font-medium text-left">Qtd</th>
+                
+                <th class="p-4 font-medium text-left">Total</th>
+                
                 <th class="p-4 font-medium text-right">Ações</th>
               </tr>
             </thead>
