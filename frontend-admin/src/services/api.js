@@ -12,7 +12,8 @@ export const getVendas = async () => {
   // A API retorna do mais antigo para o mais novo geralmente, vamos ordenar do mais novo para o mais antigo:
   const vendas = response.data.map(v => ({
     ...v,
-    data: v.data && !v.data.endsWith('Z') ? `${v.data}Z` : v.data
+    // Garante que a data está em UTC adicionando 'Z' apenas se não tiver um sufixo de timezone
+    data: v.data && !/[+-]\d{2}:\d{2}$|Z$/.test(v.data) ? `${v.data}Z` : v.data
   }));
   return vendas.sort((a, b) => new Date(b.data) - new Date(a.data));
 };

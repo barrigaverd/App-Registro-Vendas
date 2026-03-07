@@ -21,6 +21,7 @@ const carregarVendas = async () => {
   try {
     const data = await getVendas()
     vendas.value = data
+    console.log(`Vendas carregadas: ${data.length} registros`)
   } catch (err) {
     error.value = 'Falha ao carregar vendas. Verifique a conexão com o servidor.'
     console.error(err)
@@ -48,14 +49,19 @@ const vendasFiltradas = computed(() => {
     }
     
     if (periodoAtual.value === 'semana') {
-      const startOfWeek = new Date(agora)
-      startOfWeek.setDate(agora.getDate() - agora.getDay())
-      startOfWeek.setHours(0,0,0,0)
-      return dataVenda >= startOfWeek
+      // Últimos 7 dias (janela deslizante)
+      const seteDiasAtras = new Date(agora)
+      seteDiasAtras.setDate(agora.getDate() - 7)
+      seteDiasAtras.setHours(0,0,0,0)
+      return dataVenda >= seteDiasAtras
     }
     
     if (periodoAtual.value === 'mes') {
-      return dataVenda.getMonth() === agora.getMonth() && dataVenda.getFullYear() === agora.getFullYear()
+      // Últimos 30 dias
+      const trintaDiasAtras = new Date(agora)
+      trintaDiasAtras.setDate(agora.getDate() - 30)
+      trintaDiasAtras.setHours(0,0,0,0)
+      return dataVenda >= trintaDiasAtras
     }
     
     return true
