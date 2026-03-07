@@ -49,19 +49,19 @@ const vendasFiltradas = computed(() => {
     }
     
     if (periodoAtual.value === 'semana') {
-      // Últimos 7 dias (janela deslizante)
-      const seteDiasAtras = new Date(agora)
-      seteDiasAtras.setDate(agora.getDate() - 7)
-      seteDiasAtras.setHours(0,0,0,0)
-      return dataVenda >= seteDiasAtras
+      // Últimos 7 dias (janela deslizante incluindo hoje)
+      const dataLimite = new Date(agora)
+      dataLimite.setDate(agora.getDate() - 7)
+      dataLimite.setHours(0,0,0,0)
+      return dataVenda >= dataLimite
     }
     
     if (periodoAtual.value === 'mes') {
-      // Últimos 30 dias
-      const trintaDiasAtras = new Date(agora)
-      trintaDiasAtras.setDate(agora.getDate() - 30)
-      trintaDiasAtras.setHours(0,0,0,0)
-      return dataVenda >= trintaDiasAtras
+      // Últimos 30 dias (janela deslizante incluindo hoje)
+      const dataLimite = new Date(agora)
+      dataLimite.setDate(agora.getDate() - 30)
+      dataLimite.setHours(0,0,0,0)
+      return dataVenda >= dataLimite
     }
     
     return true

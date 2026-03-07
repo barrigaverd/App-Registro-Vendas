@@ -18,7 +18,7 @@ def create_venda(venda: schemas.VendaCreate, db: Session = Depends(get_db)):
     return crud.create_venda(db=db, venda=venda)
 
 @router.get("/", response_model=list[schemas.Venda])
-def list_vendas(data: Optional[date] = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def list_vendas(data: Optional[date] = None, skip: int = 0, limit: int = 1000, db: Session = Depends(get_db)):
     return crud.get_vendas(db=db, data_filtro=data, skip=skip, limit=limit)
 
 @router.delete("/{venda_id}")
