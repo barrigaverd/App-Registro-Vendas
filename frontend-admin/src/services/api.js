@@ -10,7 +10,11 @@ const api = axios.create({
 export const getVendas = async () => {
   const response = await api.get('/vendas/');
   // A API retorna do mais antigo para o mais novo geralmente, vamos ordenar do mais novo para o mais antigo:
-  return response.data.sort((a, b) => new Date(b.data) - new Date(a.data));
+  const vendas = response.data.map(v => ({
+    ...v,
+    data: v.data && !v.data.endsWith('Z') ? `${v.data}Z` : v.data
+  }));
+  return vendas.sort((a, b) => new Date(b.data) - new Date(a.data));
 };
 
 export const updateVenda = async (id, vendaData) => {

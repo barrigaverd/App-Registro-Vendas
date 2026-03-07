@@ -1,0 +1,10 @@
+[tool.ruff]
+exclude = [
+    ".agent",
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = [
+    "^\\.agent/.*",
+]
