@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getVendas, updateVenda } from '../services/api'
+import { getVendas, updateVenda, deleteVenda } from '../services/api'
 import StatCard from '../components/StatCard.vue'
-import { DollarSign, ShoppingBag, TrendingUp, Calendar, CheckSquare, Square } from 'lucide-vue-next'
+import { DollarSign, ShoppingBag, TrendingUp, Calendar, CheckSquare, Square, Trash2, Edit, X } from 'lucide-vue-next'
 
 const vendas = ref([])
 const loading = ref(true)
@@ -27,6 +27,48 @@ const carregarVendas = async () => {
     console.error(err)
   } finally {
     loading.value = false
+  }
+}
+
+const showEditModal = ref(false)
+const editForm = ref({
+  id: null,
+  nome: '',
+  valor: 0,
+  quantidade: 1,
+  observacoes: '',
+  data: '',
+  lancado: false
+})
+
+const editarVenda = (venda) => {
+  editForm.value = { ...venda }
+  showEditModal.value = true
+}
+
+const deletarVenda = async (id) => {
+  if (!window.confirm('Tem certeza que deseja apagar esta venda?')) return
+  
+  try {
+    await deleteVenda(id)
+    vendas.value = vendas.value.filter(v => v.id !== id)
+  } catch (err) {
+    console.error('Erro ao deletar:', err)
+    alert('Falha ao deletar a venda.')
+  }
+}
+
+const salvarEdicao = async () => {
+  try {
+    const data = await updateVenda(editForm.value.id, editForm.value)
+    const index = vendas.value.findIndex(v => v.id === data.id)
+    if (index !== -1) {
+      vendas.value[index] = data
+    }
+    showEditModal.value = false
+  } catch (err) {
+    console.error('Erro ao salvar:', err)
+    alert('Falha ao salvar as alterações.')
   }
 }
 
@@ -167,17 +209,12 @@ const toggleLancado = async (venda) => {
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-gray-50/50 text-text-secondary text-sm">
-                <th class="p-4 font-medium w-16 text-center">Lançado</th>
-                <th class="p-4 font-medium">Nome do Produto</th>
-                <th class="p-4 font-medium">Data e Hora</th>
-                <th class="p-4 font-medium">Valor Unidade</th>
-                <th class="p-4 font-medium">Qtd</th>
-                <th class="p-4 font-medium">Total</th>
+                <th class="p-4 font-medium text-right">Ações</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="vendasFiltradas.length === 0">
-                <td colspan="6" class="p-8 text-center text-text-secondary">
+                <td colspan="7" class="p-8 text-center text-text-secondary">
                   Nenhuma venda encontrada para este período.
                 </td>
               </tr>
@@ -220,11 +257,94 @@ const toggleLancado = async (venda) => {
                 <td class="p-4 font-bold text-primary" :class="{'line-through text-text-secondary font-medium': venda.lancado}">
                   {{ formatCurrency(venda.valor * venda.quantidade) }}
                 </td>
+                <td class="p-4 text-right">
+                  <div class="flex justify-end gap-2">
+                    <button 
+                      @click="editarVenda(venda)"
+                      class="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                      title="Editar"
+                    >
+                      <Edit class="w-5 h-5" />
+                    </button>
+                    <button 
+                      @click="deletarVenda(venda.id)"
+                      class="p-2 text-error hover:bg-error/10 rounded-lg transition-colors"
+                      title="Deletar"
+                    >
+                      <Trash2 class="w-5 h-5" />
+                    </button>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </template>
+
+    <!-- Modal de Edição -->
+    <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div class="bg-surface w-full max-w-lg rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+          <h3 class="text-xl font-bold text-text-primary">Editar Venda</h3>
+          <button @click="showEditModal = false" class="text-text-secondary hover:text-primary p-1">
+            <X class="w-6 h-6" />
+          </button>
+        </div>
+        
+        <form @submit.prevent="salvarEdicao" class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-text-secondary mb-1">Produto</label>
+            <input 
+              v-model="editForm.nome" type="text" required
+              class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            />
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-text-secondary mb-1">Valor Unitário</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary">R$</span>
+                <input 
+                  v-model.number="editForm.valor" type="number" step="0.01" required
+                  class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-text-secondary mb-1">Quantidade</label>
+              <input 
+                v-model.number="editForm.quantidade" type="number" required min="1"
+                class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-text-secondary mb-1">Observações</label>
+            <textarea 
+              v-model="editForm.observacoes" rows="3"
+              class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+            ></textarea>
+          </div>
+          
+          <div class="pt-4 flex gap-3">
+            <button 
+              type="button" @click="showEditModal = false"
+              class="flex-1 px-6 py-3 rounded-xl border border-gray-200 font-bold text-text-secondary hover:bg-gray-50 transition-all"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit"
+              class="flex-[2] px-6 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+            >
+              Salvar Alterações
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>

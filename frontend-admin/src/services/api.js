@@ -13,8 +13,8 @@ export const getVendas = async () => {
   return vendas.sort((a, b) => new Date(b.data) - new Date(a.data));
 };
 
-export const updateVenda = async (id, vendaData) => {
-  const response = await api.put(`/vendas/${id}`, vendaData);
+export const deleteVenda = async (id) => {
+  const response = await api.delete(`/vendas/${id}`);
   return response.data;
 };
 
