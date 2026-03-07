@@ -8,7 +8,11 @@ class VendaBase(BaseModel):
     quantidade: int = 1
     observacoes: Optional[str] = None
     data: Optional[datetime] = None
+<<<<<<< HEAD
     venda_lancada: Optional[bool] = False
+=======
+    lancado: bool = False
+>>>>>>> 0ffe04b (feat: complete frontend admin and backend lancado feature)
 
 class VendaCreate(VendaBase):
     pass

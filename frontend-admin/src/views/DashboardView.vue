@@ -77,14 +77,17 @@ const ticketMedio = computed(() => {
 })
 
 const toggleLancado = async (venda) => {
-  venda.venda_lancada = !venda.venda_lancada
-  try{
-    await updateVenda(venda.id, venda)  
+  const novoStatus = !venda.lancado;
+  venda.lancado = novoStatus; // optimistic update
+  
+  try {
+    const payload = { ...venda, lancado: novoStatus };
+    await updateVenda(venda.id, payload);
+  } catch (err) {
+    venda.lancado = !novoStatus; // revert on fail
+    console.error('API Error updating lancado:', err);
+    alert('Não foi possivel atualizar o status de lançamento no servidor.');
   }
-  catch(err){
-    console.error(err)
-    venda.venda_lancada = !venda.venda_lancada
-  }  
 }
 </script>
 
@@ -177,7 +180,7 @@ const toggleLancado = async (venda) => {
                 :key="venda.id"
                 :class="[
                   'border-t border-gray-50 transition-colors',
-                  venda.venda_lancada ? 'bg-success/5' : 'hover:bg-gray-50/50'
+                  venda.lancado ? 'bg-success/5' : 'hover:bg-gray-50/50'
                 ]"
               >
                 <!-- Checkbox Lançado -->
@@ -186,29 +189,29 @@ const toggleLancado = async (venda) => {
                     @click="toggleLancado(venda)"
                     class="focus:outline-none transition-transform active:scale-95"
                   >
-                    <CheckSquare v-if="venda.venda_lancada" class="w-6 h-6 text-success mx-auto" stroke-width="2.5" />
+                    <CheckSquare v-if="venda.lancado" class="w-6 h-6 text-success mx-auto" stroke-width="2.5" />
                     <Square v-else class="w-6 h-6 text-gray-300 hover:text-primary transition-colors mx-auto" />
                   </button>
                 </td>
                 
                 <td class="p-4">
-                  <p class="font-medium text-text-primary" :class="{'line-through text-text-secondary': venda.venda_lancada}">
+                  <p class="font-medium text-text-primary" :class="{'line-through text-text-secondary': venda.lancado}">
                     {{ venda.nome }}
                   </p>
-                  <p v-if="venda.observacoes" class="text-xs text-text-secondary mt-0.5 truncate max-w-xs" :class="{'line-through': venda.venda_lancada}">
+                  <p v-if="venda.observacoes" class="text-xs text-text-secondary mt-0.5 truncate max-w-xs" :class="{'line-through': venda.lancado}">
                     {{ venda.observacoes }}
                   </p>
                 </td>
-                <td class="p-4 text-sm text-text-secondary" :class="{'line-through': venda.venda_lancada}">
+                <td class="p-4 text-sm text-text-secondary" :class="{'line-through': venda.lancado}">
                   {{ formatDate(venda.data) }}
                 </td>
-                <td class="p-4 text-text-primary" :class="{'line-through text-text-secondary': venda.venda_lancada}">
+                <td class="p-4 text-text-primary" :class="{'line-through text-text-secondary': venda.lancado}">
                   {{ formatCurrency(venda.valor) }}
                 </td>
-                <td class="p-4 text-text-primary" :class="{'line-through text-text-secondary': venda.venda_lancada}">
+                <td class="p-4 text-text-primary" :class="{'line-through text-text-secondary': venda.lancado}">
                   {{ venda.quantidade }}
                 </td>
-                <td class="p-4 font-bold text-primary" :class="{'line-through text-text-secondary font-medium': venda.venda_lancada}">
+                <td class="p-4 font-bold text-primary" :class="{'line-through text-text-secondary font-medium': venda.lancado}">
                   {{ formatCurrency(venda.valor * venda.quantidade) }}
                 </td>
               </tr>
